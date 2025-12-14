@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getWordsByCategory, getAllWords, getCategoryById } from '@/lib/db';
+import { getWordsByCategory, getAllWords, getCategoryById } from '@/lib/db-new';
 
 export async function GET(
   request: NextRequest,
@@ -7,20 +7,20 @@ export async function GET(
 ) {
   try {
     const categoryId = params.categoryId;
-    
+
     let words;
     let categoryName;
-    
+
     if (categoryId === 'all') {
-      words = getAllWords();
+      words = await getAllWords();
       categoryName = 'Todas as Categorias';
     } else {
       const id = parseInt(categoryId);
-      words = getWordsByCategory(id);
-      const category = getCategoryById(id);
+      words = await getWordsByCategory(id);
+      const category = await getCategoryById(id);
       categoryName = category?.name_pt || 'Categoria';
     }
-    
+
     return NextResponse.json({ words, categoryName });
   } catch (error) {
     console.error('Error fetching words:', error);

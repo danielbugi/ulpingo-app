@@ -1,0 +1,44 @@
+services:
+  postgres-ulpingo:
+    image: postgres:16-alpine
+    container_name: ulpingo-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ulpingo
+      POSTGRES_PASSWORD: ulpingo_password
+      POSTGRES_DB: ulpingo_db
+    volumes:
+      - ulpingo_postgres_data:/var/lib/postgresql/data
+    ports:
+      - '5434:5432'
+    networks:
+      - ulpingo-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ulpingo']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ulpingo-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ulpingo-app
+    restart: unless-stopped
+    ports:
+      - '3001:3001'
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://ulpingo:ulpingo_password@postgres-ulpingo:5432/ulpingo_db
+    depends_on:
+      postgres-ulpingo:
+        condition: service_healthy
+    networks:
+      - ulpingo-network
+
+volumes:
+  ulpingo_postgres_data:
+
+networks:
+  ulpingo-network:
+    driver: bridge

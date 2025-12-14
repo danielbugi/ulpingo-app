@@ -1,6 +1,11 @@
 // Hebrew Text-to-Speech using Web Speech API
 
 export const speakHebrew = (text: string): void => {
+  // Check if we're in a browser environment
+  if (typeof window === 'undefined') {
+    return;
+  }
+
   // Check if browser supports speech synthesis
   if (!('speechSynthesis' in window)) {
     console.error('Speech synthesis not supported');
@@ -33,8 +38,8 @@ export const speakHebrew = (text: string): void => {
   window.speechSynthesis.speak(utterance);
 };
 
-// Load voices when available
-if ('speechSynthesis' in window) {
+// Load voices when available (only in browser)
+if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
   window.speechSynthesis.onvoiceschanged = () => {
     window.speechSynthesis.getVoices();
   };

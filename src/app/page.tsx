@@ -1,11 +1,20 @@
 import Link from 'next/link';
 import { Card, CardBody, Button, Chip } from '@heroui/react';
-import { BookOpen, Gamepad2, Trophy, Sparkles, Zap, Star } from 'lucide-react';
-import { getCategories, getProgress } from '@/lib/db';
+import {
+  BookOpen,
+  Gamepad2,
+  Trophy,
+  Sparkles,
+  Star,
+  Calendar,
+} from 'lucide-react';
+import { getCategories, getProgress } from '@/lib/db-new';
+import { getDueCount } from '@/lib/db-new';
 
-export default function Home() {
-  const categories = getCategories();
-  const progress = getProgress();
+export default async function Home() {
+  const categories = await getCategories();
+  const progress = await getProgress();
+  const dueCount = await getDueCount();
 
   const totalWords = progress.length;
   const correctAnswers = progress.reduce((sum, p) => sum + p.correct_count, 0);
@@ -33,25 +42,6 @@ export default function Home() {
       ></div>
 
       <div className="relative z-10 container mx-auto px-4 py-8">
-        {/* Header */}
-        <nav className="flex justify-between items-center mb-12 p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-lg flex items-center justify-center">
-              <Zap className="w-6 h-6 text-white" />
-            </div>
-            <h1 className="text-2xl font-bold text-white">Ulpingo</h1>
-          </div>
-
-          <div className="flex gap-2">
-            <Button variant="light" className="text-gray-300">
-              Sobre
-            </Button>
-            <Button variant="light" className="text-gray-300">
-              Contato
-            </Button>
-          </div>
-        </nav>
-
         {/* Hero Section */}
         <div className="text-center mb-16 py-12">
           <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 rounded-full px-4 py-2 mb-6">
@@ -100,6 +90,43 @@ export default function Home() {
             </div>
           )}
         </div>
+
+        {/* Review Section - Add this after Hero Section */}
+        {dueCount > 0 && (
+          <div className="mb-16">
+            <div className="max-w-3xl mx-auto bg-gradient-to-br from-blue-900/50 to-cyan-900/50 backdrop-blur-xl border border-blue-500/30 rounded-3xl p-12">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                      <Calendar className="w-6 h-6 text-white" />
+                    </div>
+                    <h3 className="text-3xl font-bold text-white">
+                      Revisão do Dia
+                    </h3>
+                  </div>
+                  <p className="text-gray-400 text-lg mb-4">
+                    Você tem{' '}
+                    <span className="text-blue-400 font-bold">{dueCount}</span>{' '}
+                    {dueCount === 1 ? 'palavra' : 'palavras'} para revisar hoje
+                  </p>
+                  <p className="text-gray-500 text-sm">
+                    💡 Revisões espaçadas ajudam você a lembrar por mais tempo!
+                  </p>
+                </div>
+                <Link href="/review">
+                  <Button
+                    size="lg"
+                    className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold text-lg px-8 hover:from-blue-500 hover:to-cyan-500 shadow-xl"
+                    startContent={<Sparkles className="w-5 h-5" />}
+                  >
+                    Revisar Agora
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Categories */}
         <div className="mb-16">
