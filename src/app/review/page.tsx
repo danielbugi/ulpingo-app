@@ -6,6 +6,9 @@ import { Button, Progress } from '@heroui/react';
 import { ArrowLeft, Home, Calendar, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import ReviewCard from '@/components/ReviewCard';
+import { useUserId } from '@/lib/hooks/useUserId';
+import { updateGuestStats } from '@/lib/guest-session';
+import { useSession } from 'next-auth/react';
 
 interface Word {
   id: number;
@@ -16,6 +19,8 @@ interface Word {
 
 export default function ReviewPage() {
   const router = useRouter();
+  const { data: session } = useSession();
+  const userId = useUserId();
   const [words, setWords] = useState<Word[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
@@ -23,13 +28,19 @@ export default function ReviewPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    loadDueWords();
-  }, []);
+    if (userId) {
+      loadDueWords();
+    }
+  }, [userId]);
 
   const loadDueWords = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/review');
+      const url =
+        typeof userId === 'string'
+          ? `/api/review?guestId=${encodeURIComponent(userId)}`
+          : '/api/review';
+      const res = await fetch(url);
       const data = await res.json();
       setWords(data.words);
       setIsLoading(false);
@@ -41,14 +52,26 @@ export default function ReviewPage() {
 
   const handleRate = async (rating: 'again' | 'hard' | 'good' | 'easy') => {
     if (words[currentIndex]) {
+      const body: any = {
+        wordId: words[currentIndex].id,
+        rating,
+      };
+
+      if (typeof userId === 'string') {
+        body.guestId = userId;
+      }
+
       await fetch('/api/progress', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          wordId: words[currentIndex].id,
-          rating,
-        }),
+        body: JSON.stringify(body),
       });
+
+      // Update guest stats if not authenticated
+      if (!session?.user) {
+        const isCorrect = rating === 'good' || rating === 'easy';
+        updateGuestStats(isCorrect);
+      }
 
       setReviewCount(reviewCount + 1);
 

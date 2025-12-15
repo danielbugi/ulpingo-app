@@ -3,16 +3,10 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import {
-  Button,
-  Input,
-  Card,
-  CardBody,
-  CardHeader,
-  Divider,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Divider } from '@heroui/react';
 import { Mail, Lock, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { StyledInput } from '@/components/StyledInput';
 
 export default function SignInPage() {
   const router = useRouter();
@@ -129,27 +123,29 @@ export default function SignInPage() {
               </div>
             )}
 
-            <Input
-              type="email"
-              label="Email"
-              placeholder="seu@email.com"
-              variant="bordered"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              startContent={<Mail className="w-4 h-4 text-gray-400" />}
-              isRequired
-            />
+            <div>
+              <p className="text-white font-medium mb-2">Email</p>
+              <StyledInput
+                type="email"
+                placeholder="seu@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                // startContent={<Mail className="w-4 h-4 text-gray-400" />}
+                isRequired
+              />
+            </div>
 
-            <Input
-              type="password"
-              label="Senha"
-              placeholder="••••••••"
-              variant="bordered"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              startContent={<Lock className="w-4 h-4 text-gray-400" />}
-              isRequired
-            />
+            <div>
+              <p className="text-white font-medium mb-2">Senha</p>
+              <StyledInput
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                // startContent={<Lock className="w-4 h-4 text-gray-400" />}
+                isRequired
+              />
+            </div>
 
             <Button
               type="submit"

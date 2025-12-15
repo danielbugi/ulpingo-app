@@ -5,11 +5,19 @@ import {
   getInitialSRSData,
   mapRatingToQuality,
 } from '@/lib/srs';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
     const body = await request.json();
-    const { wordId, isCorrect, quality, rating } = body;
+    const { wordId, isCorrect, quality, rating, guestId } = body;
+
+    // Determine user ID (authenticated user or guest)
+    const userId = session?.user?.id
+      ? parseInt(session.user.id)
+      : guestId || null;
 
     // Support both old format (isCorrect) and new format (quality/rating)
     let finalQuality: number;
@@ -33,7 +41,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get current SRS data or use initial values
-    const currentProgress = await getSRSProgress(wordId);
+    const currentProgress = await getSRSProgress(wordId, userId);
     const currentSRS = currentProgress
       ? {
           ease_factor: currentProgress.ease_factor,
@@ -46,12 +54,13 @@ export async function POST(request: NextRequest) {
     const nextReview = calculateNextReview(finalQuality, currentSRS);
 
     // Update progress with SRS data
-    await updateProgressWithSRS(wordId, finalQuality, nextReview);
+    await updateProgressWithSRS(wordId, finalQuality, nextReview, userId);
 
     return NextResponse.json({
       success: true,
       nextReview: nextReview.next_review_date,
       interval: nextReview.interval,
+      isGuest: !session?.user?.id,
     });
   } catch (error) {
     console.error('Error updating progress:', error);

@@ -13,6 +13,9 @@ import {
   XCircle,
 } from 'lucide-react';
 import MultipleChoice from '@/components/MultipleChoice';
+import { useUserId } from '@/lib/hooks/useUserId';
+import { updateGuestStats } from '@/lib/guest-session';
+import { useSession } from 'next-auth/react';
 
 interface Word {
   id: number;
@@ -32,6 +35,8 @@ export default function QuizPage() {
   const params = useParams();
   const router = useRouter();
   const categoryId = params.categoryId as string;
+  const { data: session } = useSession();
+  const userId = useUserId();
 
   const [words, setWords] = useState<Word[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -82,11 +87,25 @@ export default function QuizPage() {
 
   const handleAnswer = async (isCorrect: boolean) => {
     if (questions[currentIndex]) {
+      const body: any = {
+        wordId: questions[currentIndex].id,
+        isCorrect,
+      };
+
+      if (typeof userId === 'string') {
+        body.guestId = userId;
+      }
+
       await fetch('/api/progress', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wordId: questions[currentIndex].id, isCorrect }),
+        body: JSON.stringify(body),
       });
+
+      // Update guest stats if not authenticated
+      if (!session?.user) {
+        updateGuestStats(isCorrect);
+      }
 
       if (isCorrect) {
         setScore(score + 1);

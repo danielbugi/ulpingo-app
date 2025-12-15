@@ -12,6 +12,9 @@ import {
   XCircle,
 } from 'lucide-react';
 import FlashCard from '@/components/FlashCard';
+import { useUserId } from '@/lib/hooks/useUserId';
+import { saveGuestProgress, updateGuestStats } from '@/lib/guest-session';
+import { useSession } from 'next-auth/react';
 
 interface Word {
   id: number;
@@ -24,6 +27,8 @@ export default function FlashcardsPage() {
   const params = useParams();
   const router = useRouter();
   const categoryId = params.categoryId as string;
+  const { data: session } = useSession();
+  const userId = useUserId();
 
   const [words, setWords] = useState<Word[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -49,14 +54,25 @@ export default function FlashcardsPage() {
 
   const handleKnow = async () => {
     if (words[currentIndex]) {
+      const body: any = {
+        wordId: words[currentIndex].id,
+        isCorrect: true,
+      };
+
+      if (typeof userId === 'string') {
+        body.guestId = userId;
+      }
+
       await fetch('/api/progress', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          wordId: words[currentIndex].id,
-          isCorrect: true,
-        }),
+        body: JSON.stringify(body),
       });
+
+      // Update guest stats if not authenticated
+      if (!session?.user) {
+        updateGuestStats(true);
+      }
 
       setStats((prev) => ({ ...prev, known: prev.known + 1 }));
       nextCard();
@@ -65,14 +81,25 @@ export default function FlashcardsPage() {
 
   const handleDontKnow = async () => {
     if (words[currentIndex]) {
+      const body: any = {
+        wordId: words[currentIndex].id,
+        isCorrect: false,
+      };
+
+      if (typeof userId === 'string') {
+        body.guestId = userId;
+      }
+
       await fetch('/api/progress', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          wordId: words[currentIndex].id,
-          isCorrect: false,
-        }),
+        body: JSON.stringify(body),
       });
+
+      // Update guest stats if not authenticated
+      if (!session?.user) {
+        updateGuestStats(false);
+      }
 
       setStats((prev) => ({ ...prev, unknown: prev.unknown + 1 }));
       nextCard();

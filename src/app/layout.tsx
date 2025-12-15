@@ -1,10 +1,13 @@
 // src/app/layout.tsx
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import Link from 'next/link';
 import './globals.css';
 import { heroui } from '@heroui/react';
 import SessionProvider from '@/components/SessionProvider';
 import UserMenu from '@/components/UserMenu';
+import SignupPrompt from '@/components/SignupPrompt';
+import '@/lib/dev-utils'; // Dev utilities for debugging
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -27,10 +30,13 @@ export default function RootLayout({
           <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/10">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-16">
-                <div className="flex items-center gap-2">
+                <Link
+                  href="/"
+                  className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                >
                   <span className="text-2xl">🇮🇱</span>
                   <h1 className="text-xl font-bold text-gradient">Ulpingo</h1>
-                </div>
+                </Link>
                 <UserMenu />
               </div>
             </div>
@@ -38,6 +44,9 @@ export default function RootLayout({
 
           {/* Main Content */}
           <main className="pt-16">{children}</main>
+
+          {/* Signup Prompt Modal */}
+          <SignupPrompt />
         </SessionProvider>
       </body>
     </html>
