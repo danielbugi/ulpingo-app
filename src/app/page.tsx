@@ -13,6 +13,7 @@ import { getDueCount } from '@/lib/db-new';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import HomeClient from '@/app/HomeClient';
+import WelcomeModal from '@/components/WelcomeModal';
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -35,6 +36,7 @@ export default async function Home() {
 
   return (
     <HomeClient>
+      <WelcomeModal />
       <main className="min-h-screen bg-black relative overflow-hidden">
         {/* Animated background gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-cyan-900/20"></div>
