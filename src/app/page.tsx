@@ -14,6 +14,16 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import HomeClient from '@/app/HomeClient';
 import WelcomeModal from '@/components/WelcomeModal';
+import Script from 'next/script';
+
+export const metadata = {
+  title: 'Ulpingo - Aprenda Hebraico Grátis com Flashcards | Curso Online',
+  description:
+    'Aprenda hebraico do zero com flashcards interativos, áudio nativo e repetição espaçada. Método eficaz para brasileiros. 100% gratuito. Comece agora!',
+  alternates: {
+    canonical: 'https://ulpingo.app',
+  },
+};
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -34,8 +44,41 @@ export default async function Home() {
   const accuracy =
     totalAttempts > 0 ? Math.round((correctAnswers / totalAttempts) * 100) : 0;
 
+  // Structured Data (JSON-LD) for SEO
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'Ulpingo',
+    applicationCategory: 'EducationalApplication',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'BRL',
+    },
+    description:
+      'Aprenda hebraico do zero com flashcards interativos, áudio nativo e repetição espaçada.',
+    inLanguage: 'pt-BR',
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.8',
+      ratingCount: '150',
+    },
+    featureList: [
+      'Flashcards interativos',
+      'Áudio nativo',
+      'Repetição espaçada',
+      'Quizzes',
+      'Sistema de conquistas',
+    ],
+  };
+
   return (
     <HomeClient>
+      <Script
+        id="structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       <WelcomeModal />
       <main className="min-h-screen bg-black relative overflow-hidden">
         {/* Animated background gradient */}

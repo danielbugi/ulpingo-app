@@ -12,9 +12,78 @@ import '@/lib/dev-utils'; // Dev utilities for debugging
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Ulpingo - Aprenda Hebraico',
+  metadataBase: new URL('https://ulpingo.app'),
+  title: {
+    default: 'Ulpingo - Aprenda Hebraico Grátis com Flashcards | Curso Online',
+    template: '%s | Ulpingo',
+  },
   description:
-    'Aprenda Hebraico de forma divertida e eficaz com flashcards e spaced repetition',
+    'Aprenda hebraico do zero com flashcards interativos, áudio nativo e repetição espaçada. Método eficaz para brasileiros. 100% gratuito. Comece agora!',
+  keywords: [
+    'aprender hebraico',
+    'hebraico online',
+    'curso de hebraico gratis',
+    'hebraico para brasileiros',
+    'flashcards hebraico',
+    'vocabulário hebraico',
+    'app hebraico',
+    'aprender hebraico do zero',
+    'עברית',
+    'hebrew learning',
+  ],
+  authors: [{ name: 'Ulpingo' }],
+  creator: 'Ulpingo',
+  publisher: 'Ulpingo',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'pt_BR',
+    url: 'https://ulpingo.app',
+    title: 'Ulpingo - Aprenda Hebraico Grátis com Flashcards',
+    description:
+      'Aprenda hebraico do zero com flashcards interativos, áudio nativo e repetição espaçada. Método eficaz para brasileiros. 100% gratuito.',
+    siteName: 'Ulpingo',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Ulpingo - Aprenda Hebraico',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Ulpingo - Aprenda Hebraico Grátis',
+    description:
+      'Aprenda hebraico do zero com flashcards interativos e áudio nativo. 100% gratuito!',
+    images: ['/og-image.png'],
+    creator: '@ulpingo',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
+  manifest: '/manifest.json',
+  alternates: {
+    canonical: 'https://ulpingo.app',
+  },
 };
 
 export default function RootLayout({

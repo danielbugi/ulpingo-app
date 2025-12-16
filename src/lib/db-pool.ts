@@ -13,20 +13,24 @@ export function getPool(): Pool {
     let sslConfig: boolean | { rejectUnauthorized: boolean } = false;
 
     if (databaseUrl) {
-      // Check if the connection string explicitly requires SSL
-      const requiresSsl =
-        databaseUrl.includes('sslmode=require') ||
-        databaseUrl.includes('neon.tech') ||
-        databaseUrl.includes('railway.app') ||
-        databaseUrl.includes('supabase.co');
+      // Check if it's a local database (localhost or 127.0.0.1)
+      const isLocalDb = databaseUrl.includes('localhost') || databaseUrl.includes('127.0.0.1');
+      
+      if (isLocalDb) {
+        // Local databases typically don't support SSL
+        sslConfig = false;
+      } else {
+        // Check if the connection string explicitly requires SSL (cloud databases)
+        const requiresSsl =
+          databaseUrl.includes('sslmode=require') ||
+          databaseUrl.includes('neon.tech') ||
+          databaseUrl.includes('railway.app') ||
+          databaseUrl.includes('supabase.co');
 
-      if (requiresSsl) {
-        sslConfig = { rejectUnauthorized: false };
-      } else if (process.env.NODE_ENV === 'production') {
-        // In production, try SSL but allow non-SSL connections
-        sslConfig = { rejectUnauthorized: false };
+        if (requiresSsl || process.env.NODE_ENV === 'production') {
+          sslConfig = { rejectUnauthorized: false };
+        }
       }
-      // For local development, SSL is disabled by default
     }
 
     pool = new Pool({

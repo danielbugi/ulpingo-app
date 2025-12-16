@@ -1,0 +1,16 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Disallow admin/api routes
+Disallow: /api/
+Disallow: /auth/
+
+# Allow specific API routes that should be indexed
+Allow: /api/health
+
+# Sitemap location
+Sitemap: https://ulpingo.app/sitemap.xml
+
+# Crawl-delay (optional, helps with server load)
+Crawl-delay: 1
