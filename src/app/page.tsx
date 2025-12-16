@@ -22,7 +22,7 @@ export default async function Home() {
   // Only load progress/stats for authenticated users on server-side
   // Guest users will load their data client-side from localStorage
   const progress = userId ? await getProgress(userId) : [];
-  const dueCount = userId ? await getDueCount(userId) : 0;
+  let dueCount = userId ? await getDueCount(userId) : 0;
 
   const totalWords = progress.length;
   const correctAnswers = progress.reduce((sum, p) => sum + p.correct_count, 0);

@@ -63,6 +63,7 @@ node database/seed.js
 1. Go to your Vercel project dashboard
 2. Navigate to **Settings → Environment Variables**
 3. Add the following variables:
+
    - `DATABASE_URL`: Your Neon connection string
    - `NEXTAUTH_SECRET`: Generated secret (use `openssl rand -base64 32`)
    - `NEXTAUTH_URL`: Your production URL (e.g., https://ulpingo-app.vercel.app)
@@ -91,6 +92,7 @@ Neon automatically handles connection pooling, but if you need more control, you
 ## Monitoring
 
 Monitor your database usage in the Neon Console:
+
 - Go to **Monitoring** tab
 - Check query performance
 - Monitor storage usage
@@ -99,16 +101,19 @@ Monitor your database usage in the Neon Console:
 ## Troubleshooting
 
 ### Connection Issues
+
 - Ensure `?sslmode=require` is in your connection string
 - Check that your IP isn't blocked (Neon allows all by default)
 - Verify the connection string is correct
 
 ### Migration Issues
+
 - Run migrations in order: `schema.sql` → `migration-add-srs.sql`
 - Check Neon Console logs for errors
 - Ensure all tables are created before seeding
 
 ### Vercel Deployment Issues
+
 - Verify all environment variables are set
 - Check Vercel deployment logs
 - Ensure DATABASE_URL is accessible from Vercel's network

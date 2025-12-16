@@ -307,10 +307,15 @@ export const getDueCount = async (
 
     const result = await client.query(
       `
-      SELECT COUNT(DISTINCT w.id) as count
+      SELECT COUNT(*) as count
       FROM words w
-      LEFT JOIN user_progress up ON w.id = up.word_id AND (up.user_id = $1 OR (up.user_id IS NULL AND $1 IS NULL))
-      WHERE up.next_review_date <= NOW() OR up.next_review_date IS NULL
+      LEFT JOIN user_progress up ON w.id = up.word_id 
+        AND (
+          (up.user_id = $1 AND $1 IS NOT NULL) 
+          OR (up.user_id IS NULL AND $1 IS NULL)
+        )
+      WHERE up.next_review_date IS NULL 
+         OR up.next_review_date <= NOW()
       `,
       [userIdValue]
     );

@@ -5,38 +5,50 @@ After setting up your Neon database, configure these environment variables in Ve
 ## Required Variables
 
 ### 1. Database
+
 ```
 DATABASE_URL
 ```
+
 **Value**: Your Neon PostgreSQL connection string
+
 ```
 postgresql://[username]:[password]@[endpoint]/neondb?sslmode=require
 ```
+
 **Where to get it**: Neon Console → Your Project → Connection Details
 
 ---
 
 ### 2. NextAuth Secret
+
 ```
 NEXTAUTH_SECRET
 ```
+
 **Value**: A random secret key (32+ characters)
 **How to generate**:
+
 ```bash
 openssl rand -base64 32
 ```
+
 Or use: https://generate-secret.vercel.app/32
 
 ---
 
 ### 3. NextAuth URL
+
 ```
 NEXTAUTH_URL
 ```
+
 **Value**: Your production domain
+
 ```
 https://ulpingo-app.vercel.app
 ```
+
 Or your custom domain if you have one.
 
 ---
@@ -44,11 +56,14 @@ Or your custom domain if you have one.
 ## Optional Variables (Google OAuth)
 
 ### 4. Google Client ID
+
 ```
 GOOGLE_CLIENT_ID
 ```
+
 **Value**: Your Google OAuth 2.0 Client ID
-**Where to get it**: 
+**Where to get it**:
+
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Create a project or select existing
 3. Enable Google+ API
@@ -60,9 +75,11 @@ GOOGLE_CLIENT_ID
 ---
 
 ### 5. Google Client Secret
+
 ```
 GOOGLE_CLIENT_SECRET
 ```
+
 **Value**: Your Google OAuth 2.0 Client Secret
 **Where to get it**: Same as Client ID above
 
@@ -71,18 +88,22 @@ GOOGLE_CLIENT_SECRET
 ## Additional Variables
 
 ### 6. Node Environment
+
 ```
 NODE_ENV
 ```
+
 **Value**: `production`
 **Note**: Usually set automatically by Vercel
 
 ---
 
 ### 7. Disable Telemetry (Optional)
+
 ```
 NEXT_TELEMETRY_DISABLED
 ```
+
 **Value**: `1`
 **Note**: Disables Next.js telemetry
 
@@ -91,6 +112,7 @@ NEXT_TELEMETRY_DISABLED
 ## How to Set Variables in Vercel
 
 ### Method 1: Vercel Dashboard (Recommended)
+
 1. Go to https://vercel.com/dashboard
 2. Select your project: `ulpingo-app`
 3. Click **Settings** → **Environment Variables**
@@ -101,6 +123,7 @@ NEXT_TELEMETRY_DISABLED
 5. Click **Save**
 
 ### Method 2: Vercel CLI
+
 ```bash
 # Install Vercel CLI if not already installed
 npm i -g vercel
@@ -122,6 +145,7 @@ vercel env add DATABASE_URL development
 ```
 
 ### Method 3: Import from .env file
+
 1. Create a `.env.production` file with all your variables
 2. In Vercel Dashboard → Settings → Environment Variables
 3. Click **Add New** → **Import .env**
@@ -132,15 +156,18 @@ vercel env add DATABASE_URL development
 ## After Setting Variables
 
 ### Redeploy Your Application
+
 Variables are only applied to new deployments. To apply them:
 
 **Option A: Trigger new deployment**
+
 ```bash
 git commit --allow-empty -m "Trigger redeploy with env vars"
 git push origin main
 ```
 
 **Option B: Redeploy from Vercel Dashboard**
+
 1. Go to Deployments tab
 2. Click ⋯ (three dots) on latest deployment
 3. Click **Redeploy**
@@ -152,12 +179,15 @@ git push origin main
 After deployment, check:
 
 1. **Health Check Endpoint**
+
    ```
    https://your-domain.vercel.app/api/health
    ```
+
    Should return: `{"status":"ok"}`
 
 2. **Database Connection**
+
    - Try signing up for an account
    - Check if data persists
    - Test flashcard functionality
@@ -171,22 +201,26 @@ After deployment, check:
 ## Troubleshooting
 
 ### Database Connection Fails
+
 - ✅ Ensure `?sslmode=require` is in DATABASE_URL
 - ✅ Check Neon database is not paused (free tier auto-pauses)
 - ✅ Verify connection string is correct (no typos)
 - ✅ Check Neon allows connections from all IPs (default)
 
 ### NextAuth Errors
+
 - ✅ Ensure NEXTAUTH_SECRET is set and matches across all environments
 - ✅ Verify NEXTAUTH_URL matches your actual domain (with https://)
 - ✅ For Google OAuth, check redirect URIs are correctly configured
 
 ### Build Failures
+
 - ✅ Check build logs in Vercel dashboard
 - ✅ Ensure all dependencies are in package.json
 - ✅ Verify TypeScript types are correct
 
 ### Runtime Errors
+
 - ✅ Check Function Logs in Vercel deployment
 - ✅ Verify all required environment variables are set
 - ✅ Test API endpoints directly
