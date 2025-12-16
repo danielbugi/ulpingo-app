@@ -3,6 +3,7 @@
 ## Quick Start Testing
 
 ### Option 1: Browser Console (Fastest)
+
 Open your browser's DevTools console (F12) and run these commands:
 
 ```javascript
@@ -14,7 +15,7 @@ console.table(achievements);
 
 // 2. Unlock a specific achievement manually
 const achievements = JSON.parse(localStorage.getItem('ulpingo_achievements'));
-const firstWord = achievements.find(a => a.id === 'first_word');
+const firstWord = achievements.find((a) => a.id === 'first_word');
 firstWord.unlocked = true;
 firstWord.unlockedAt = new Date().toISOString();
 localStorage.setItem('ulpingo_achievements', JSON.stringify(achievements));
@@ -26,10 +27,9 @@ console.log('🔄 Achievements reset');
 
 // 4. Check which achievements are unlocked
 const achievements = JSON.parse(localStorage.getItem('ulpingo_achievements'));
-const unlocked = achievements.filter(a => a.unlocked);
+const unlocked = achievements.filter((a) => a.unlocked);
 console.log(`Unlocked: ${unlocked.length}/${achievements.length}`);
-unlocked.forEach(a => console.log(`${a.icon} ${a.name}`));
-
+unlocked.forEach((a) => console.log(`${a.icon} ${a.name}`));
 
 // === DAILY GOALS TESTING ===
 
@@ -66,7 +66,6 @@ console.log('📅 New day started!');
 localStorage.removeItem('ulpingo_daily_goal');
 console.log('🔄 Daily goal reset');
 
-
 // === STREAK TESTING ===
 
 // 1. View current streak
@@ -78,7 +77,7 @@ const streak = {
   currentStreak: 5,
   longestStreak: 10,
   lastVisit: new Date().toISOString(),
-  totalDays: 25
+  totalDays: 25,
 };
 localStorage.setItem('ulpingo_streak_data', JSON.stringify(streak));
 console.log('🔥 5-day streak set!');
@@ -93,7 +92,6 @@ console.log('💔 Streak will break on next update');
 // 4. Reset streak
 localStorage.removeItem('ulpingo_streak_data');
 console.log('🔄 Streak reset');
-
 
 // === COMBINED TESTING ===
 
@@ -164,23 +162,23 @@ export default function TestGamificationPage() {
   const handleSimulateWordLearned = () => {
     const newCount = wordsLearned + 1;
     setWordsLearned(newCount);
-    
+
     // Update daily goal
     handleUpdateDailyGoal();
-    
+
     // Update streak
     handleUpdateStreak();
-    
+
     // Check achievements
     const newAchievements = checkAchievements({
       wordsLearned: newCount,
       currentStreak: streakData.currentStreak,
     });
-    
+
     if (newAchievements.length > 0) {
       setCurrentAchievement(newAchievements[0]);
     }
-    
+
     refresh();
   };
 
@@ -191,11 +189,11 @@ export default function TestGamificationPage() {
       quizScore: 10,
       totalQuestions: 10,
     });
-    
+
     if (newAchievements.length > 0) {
       setCurrentAchievement(newAchievements[0]);
     }
-    
+
     refresh();
   };
 
@@ -207,7 +205,7 @@ export default function TestGamificationPage() {
     refresh();
   };
 
-  const unlockedCount = achievements.filter(a => a.unlocked).length;
+  const unlockedCount = achievements.filter((a) => a.unlocked).length;
   const goalProgress = (dailyGoal.completed / dailyGoal.target) * 100;
 
   return (
@@ -228,22 +226,13 @@ export default function TestGamificationPage() {
           <CardBody>
             <h2 className="text-xl font-bold text-white mb-4">Quick Actions</h2>
             <div className="flex flex-wrap gap-3">
-              <Button
-                color="success"
-                onPress={handleSimulateWordLearned}
-              >
+              <Button color="success" onPress={handleSimulateWordLearned}>
                 📚 Learn Word
               </Button>
-              <Button
-                color="secondary"
-                onPress={handleSimulatePerfectQuiz}
-              >
+              <Button color="secondary" onPress={handleSimulatePerfectQuiz}>
                 💯 Perfect Quiz
               </Button>
-              <Button
-                color="warning"
-                onPress={handleUpdateStreak}
-              >
+              <Button color="warning" onPress={handleUpdateStreak}>
                 🔥 Update Streak
               </Button>
               <Button
@@ -313,7 +302,8 @@ export default function TestGamificationPage() {
                 </div>
               </div>
               <p className="text-white/60 text-sm">
-                {Math.round((unlockedCount / achievements.length) * 100)}% unlocked
+                {Math.round((unlockedCount / achievements.length) * 100)}%
+                unlocked
               </p>
             </CardBody>
           </Card>
@@ -323,7 +313,8 @@ export default function TestGamificationPage() {
         <Card className="bg-white/5 border-white/10 mb-6">
           <CardBody>
             <p className="text-white text-lg">
-              Words Learned in Test: <span className="font-bold">{wordsLearned}</span>
+              Words Learned in Test:{' '}
+              <span className="font-bold">{wordsLearned}</span>
             </p>
           </CardBody>
         </Card>
@@ -331,9 +322,11 @@ export default function TestGamificationPage() {
         {/* Achievements Grid */}
         <Card className="bg-white/5 border-white/10">
           <CardBody>
-            <h2 className="text-2xl font-bold text-white mb-4">All Achievements</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">
+              All Achievements
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {achievements.map(achievement => (
+              {achievements.map((achievement) => (
                 <div
                   key={achievement.id}
                   className={`p-4 rounded-xl border-2 transition-all ${
@@ -343,7 +336,9 @@ export default function TestGamificationPage() {
                   }`}
                 >
                   <div className="text-4xl mb-2">{achievement.icon}</div>
-                  <h3 className="text-white font-bold mb-1">{achievement.name}</h3>
+                  <h3 className="text-white font-bold mb-1">
+                    {achievement.name}
+                  </h3>
                   <p className="text-white/70 text-sm mb-3">
                     {achievement.description}
                   </p>
@@ -383,6 +378,7 @@ export default function TestGamificationPage() {
 ## Testing Scenarios
 
 ### Scenario 1: First-Time User Journey
+
 1. Reset all data (browser console or reset button)
 2. Learn first word → "Primeira Palavra" should unlock
 3. Continue to 10 words → "Aprendiz" should unlock
@@ -390,6 +386,7 @@ export default function TestGamificationPage() {
 5. Continue to 100 words → "Poliglota" should unlock
 
 ### Scenario 2: Streak Building
+
 1. Complete activity today → Streak = 1
 2. Change system date to tomorrow, complete activity → Streak = 2
 3. Continue for 3 days → "Dedicado" unlocks
@@ -397,32 +394,37 @@ export default function TestGamificationPage() {
 5. Continue for 30 days → "Mestre da Consistência" unlocks
 
 ### Scenario 3: Perfect Quiz
+
 1. Set `quizScore: 10` and `totalQuestions: 10`
 2. Call `checkAchievements({..., quizScore: 10, totalQuestions: 10})`
 3. "Perfeição" should unlock
 
 ### Scenario 4: Time-Based Achievements
+
 **Early Bird (before 8am):**
+
 ```javascript
 // Set system time to 7:30 AM and complete activity
 const newAchievements = checkAchievements({
   wordsLearned: 5,
-  currentStreak: 1
+  currentStreak: 1,
 });
 // "Madrugador" should unlock
 ```
 
 **Night Owl (after 10pm):**
+
 ```javascript
 // Set system time to 11:00 PM and complete activity
 const newAchievements = checkAchievements({
   wordsLearned: 5,
-  currentStreak: 1
+  currentStreak: 1,
 });
 // "Coruja Noturna" should unlock
 ```
 
 ### Scenario 5: Daily Goals
+
 1. Start new day → Goal progress = 0
 2. Learn words → Progress increases
 3. Reach target → Goal complete (100%)
@@ -433,6 +435,7 @@ const newAchievements = checkAchievements({
 ## Manual Testing Commands
 
 ### Test Achievement Unlocking
+
 ```javascript
 // In browser console on your app page
 import { checkAchievements } from '@/lib/gamification';
@@ -442,26 +445,27 @@ const achievements = checkAchievements({
   wordsLearned: 100,
   currentStreak: 7,
   quizScore: 10,
-  totalQuestions: 10
+  totalQuestions: 10,
 });
 
 console.log('New achievements:', achievements);
 ```
 
 ### Test Streak Logic
+
 ```javascript
 // Simulate consecutive days
 const testStreak = () => {
   // Day 1
   updateStreak();
   console.log('Day 1:', getStreakData());
-  
+
   // Simulate next day
   const streak = JSON.parse(localStorage.getItem('ulpingo_streak_data'));
   const yesterday = new Date(Date.now() - 86400000);
   streak.lastVisit = yesterday.toISOString();
   localStorage.setItem('ulpingo_streak_data', JSON.stringify(streak));
-  
+
   // Day 2
   updateStreak();
   console.log('Day 2:', getStreakData());
@@ -475,18 +479,21 @@ testStreak();
 ## Expected Behavior
 
 ### Achievements
+
 - ✅ Unlock only once (no duplicates)
 - ✅ Persist in localStorage
 - ✅ Display toast notification when unlocked
 - ✅ Track unlock timestamp
 
 ### Streaks
+
 - ✅ Increment on consecutive days
 - ✅ Reset if day is skipped
 - ✅ Track longest streak
 - ✅ Count total days studied
 
 ### Daily Goals
+
 - ✅ Reset at midnight
 - ✅ Persist throughout the day
 - ✅ Allow custom targets
@@ -497,6 +504,7 @@ testStreak();
 ## Debugging Tips
 
 ### Check localStorage Data
+
 ```javascript
 // View all gamification data
 console.log('Achievements:', localStorage.getItem('ulpingo_achievements'));
@@ -507,16 +515,19 @@ console.log('Daily Goal:', localStorage.getItem('ulpingo_daily_goal'));
 ### Common Issues
 
 **Achievement not unlocking:**
+
 - Check if already unlocked: `achievement.unlocked === true`
 - Verify conditions are met (word count, streak, etc.)
 - Check console for errors
 
 **Streak not updating:**
+
 - Verify date logic (compare lastVisit with today)
 - Check if same day (no update needed)
 - Ensure `updateStreak()` is called after activities
 
 **Daily goal not resetting:**
+
 - Check if date changed: `goal.date !== today`
 - Verify `getDailyGoal()` is called (it auto-resets)
 
@@ -539,9 +550,10 @@ console.log('Daily Goal:', localStorage.getItem('ulpingo_daily_goal'));
 ## Quick Copy-Paste Tests
 
 ### Unlock All Achievements (Testing Only!)
+
 ```javascript
 const achievements = JSON.parse(localStorage.getItem('ulpingo_achievements'));
-achievements.forEach(a => {
+achievements.forEach((a) => {
   a.unlocked = true;
   a.unlockedAt = new Date().toISOString();
 });
@@ -550,23 +562,25 @@ window.location.reload();
 ```
 
 ### Set 30-Day Streak
+
 ```javascript
 const streak = {
   currentStreak: 30,
   longestStreak: 30,
   lastVisit: new Date().toISOString(),
-  totalDays: 30
+  totalDays: 30,
 };
 localStorage.setItem('ulpingo_streak_data', JSON.stringify(streak));
 window.location.reload();
 ```
 
 ### Complete Daily Goal
+
 ```javascript
 const goal = JSON.parse(localStorage.getItem('ulpingo_daily_goal')) || {
   target: 10,
   completed: 0,
-  date: new Date().toISOString().split('T')[0]
+  date: new Date().toISOString().split('T')[0],
 };
 goal.completed = goal.target;
 localStorage.setItem('ulpingo_daily_goal', JSON.stringify(goal));

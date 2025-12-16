@@ -189,7 +189,7 @@ export default function QuizPage() {
         setCurrentIndex(currentIndex + 1);
       } else {
         setIsComplete(true);
-        
+
         // Check for perfect quiz achievement
         const newAchievements = checkAchievements({
           wordsLearned: newScore,

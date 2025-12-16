@@ -401,7 +401,8 @@ export default function FlashcardsPage() {
           />
         ) : (
           <div className="mb-4 text-center text-white/40 text-sm">
-            💡 Dica: Use teclas 1 = Conheço | 2 = Não conheço | R = Reiniciar | Esc = Voltar
+            💡 Dica: Use teclas 1 = Conheço | 2 = Não conheço | R = Reiniciar |
+            Esc = Voltar
           </div>
         )}
 

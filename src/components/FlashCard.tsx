@@ -117,7 +117,7 @@ export default function FlashCard({
                     Português
                   </p>
 
-                  <h2 className="text-7xl font-bold text-white mb-8 text-center">
+                  <h2 className="text-5xl sm:text-6xl md:text-7xl font-bold text-white mb-8 text-center break-words max-w-full px-4">
                     {wordPt}
                   </h2>
 
@@ -148,13 +148,17 @@ export default function FlashCard({
                   </p>
 
                   <h2
-                    className="text-8xl font-bold text-white mb-6 text-center"
+                    className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-6 text-center break-words max-w-full px-4"
                     dir="rtl"
+                    style={{
+                      wordBreak: 'break-word',
+                      overflowWrap: 'break-word',
+                    }}
                   >
                     {wordHe}
                   </h2>
 
-                  <p className="text-3xl text-cyan-200 font-light mb-8">
+                  <p className="text-2xl sm:text-3xl text-cyan-200 font-light mb-8 break-words max-w-full px-4 text-center">
                     {transliteration}
                   </p>
 
