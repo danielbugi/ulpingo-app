@@ -2,6 +2,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import Link from 'next/link';
+import Script from 'next/script';
 import './globals.css';
 import { heroui } from '@heroui/react';
 import SessionProvider from '@/components/SessionProvider';
@@ -93,6 +94,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR" className="dark">
+      <head>
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-S2BN6C3CYB"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-S2BN6C3CYB');
+          `}
+        </Script>
+      </head>
       <body className={inter.className}>
         <SessionProvider>
           {/* Navigation Bar */}

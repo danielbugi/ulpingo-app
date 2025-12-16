@@ -14,8 +14,9 @@ export function getPool(): Pool {
 
     if (databaseUrl) {
       // Check if it's a local database (localhost or 127.0.0.1)
-      const isLocalDb = databaseUrl.includes('localhost') || databaseUrl.includes('127.0.0.1');
-      
+      const isLocalDb =
+        databaseUrl.includes('localhost') || databaseUrl.includes('127.0.0.1');
+
       if (isLocalDb) {
         // Local databases typically don't support SSL
         sslConfig = false;
