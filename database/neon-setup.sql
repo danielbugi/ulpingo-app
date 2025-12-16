@@ -149,52 +149,218 @@ CREATE TRIGGER update_user_progress_updated_at
 -- 6. SEED INITIAL DATA (Optional)
 -- ============================================
 
--- Insert categories
+-- Insert categories (14 total)
 INSERT INTO categories (name_pt, name_he, icon, color) VALUES
-  ('Cumprimentos', 'ברכות', '👋', 'bg-blue-500'),
-  ('Família', 'משפחה', '👨‍👩‍👧‍👦', 'bg-green-500'),
-  ('Números', 'מספרים', '🔢', 'bg-purple-500'),
-  ('Cores', 'צבעים', '🎨', 'bg-pink-500'),
-  ('Comida', 'אוכל', '🍕', 'bg-orange-500'),
-  ('Animais', 'חיות', '🐶', 'bg-yellow-500')
+  ('Primeiras Palavras', 'מילים ראשונות', '🌟', 'bg-gradient-to-br from-purple-500 to-pink-500'),
+  ('Família', 'משפחה', '👨‍👩‍👧‍👦', 'bg-gradient-to-br from-blue-500 to-cyan-500'),
+  ('Comida', 'אוכל', '🍎', 'bg-gradient-to-br from-orange-500 to-red-500'),
+  ('Casa', 'בית', '🏠', 'bg-gradient-to-br from-green-500 to-teal-500'),
+  ('Números', 'מספרים', '🔢', 'bg-gradient-to-br from-indigo-500 to-purple-500'),
+  ('Cores', 'צבעים', '🎨', 'bg-gradient-to-br from-pink-500 to-rose-500'),
+  ('Transporte', 'תחבורה', '🚗', 'bg-gradient-to-br from-yellow-500 to-orange-500'),
+  ('Trabalho', 'עבודה', '💼', 'bg-gradient-to-br from-gray-600 to-gray-800'),
+  ('Saúde', 'בריאות', '🏥', 'bg-gradient-to-br from-red-500 to-pink-600'),
+  ('Compras', 'קניות', '🛒', 'bg-gradient-to-br from-green-600 to-emerald-600'),
+  ('Clima', 'מזג אוויר', '🌦️', 'bg-gradient-to-br from-sky-400 to-blue-600'),
+  ('Tempo', 'זמן', '📆', 'bg-gradient-to-br from-violet-500 to-purple-600'),
+  ('Frases Úteis', 'ביטויים שימושיים', '💬', 'bg-gradient-to-br from-cyan-500 to-teal-600'),
+  ('Roupas', 'בגדים', '👕', 'bg-gradient-to-br from-fuchsia-500 to-pink-600')
 ON CONFLICT DO NOTHING;
 
--- Insert sample words (Cumprimentos - Greetings)
+-- Category 1: Primeiras Palavras (First Words)
 INSERT INTO words (category_id, word_pt, word_he, transliteration) VALUES
   (1, 'Olá', 'שלום', 'Shalom'),
-  (1, 'Bom dia', 'בוקר טוב', 'Boker tov'),
-  (1, 'Boa tarde', 'צהריים טובים', 'Tzohorayim tovim'),
-  (1, 'Boa noite', 'ערב טוב', 'Erev tov'),
-  (1, 'Tchau', 'להתראות', 'Lehitra''ot'),
   (1, 'Obrigado', 'תודה', 'Toda'),
+  (1, 'Sim', 'כן', 'Ken'),
+  (1, 'Não', 'לא', 'Lo'),
   (1, 'Por favor', 'בבקשה', 'Bevakasha'),
-  (1, 'Desculpe', 'סליחה', 'Slicha')
+  (1, 'Desculpa', 'סליחה', 'Slicha'),
+  (1, 'Bom dia', 'בוקר טוב', 'Boker Tov'),
+  (1, 'Boa noite', 'לילה טוב', 'Layla Tov'),
+  (1, 'Tchau', 'להתראות', 'Lehitraot'),
+  (1, 'Como vai?', 'מה נשמע', 'Ma Nishma')
 ON CONFLICT DO NOTHING;
 
--- Insert sample words (Família - Family)
+-- Category 2: Família (Family)
 INSERT INTO words (category_id, word_pt, word_he, transliteration) VALUES
+  (2, 'Família', 'משפחה', 'Mishpacha'),
   (2, 'Pai', 'אבא', 'Abba'),
   (2, 'Mãe', 'אמא', 'Ima'),
+  (2, 'Filho', 'בן', 'Ben'),
+  (2, 'Filha', 'בת', 'Bat'),
   (2, 'Irmão', 'אח', 'Ach'),
   (2, 'Irmã', 'אחות', 'Achot'),
   (2, 'Avô', 'סבא', 'Saba'),
   (2, 'Avó', 'סבתא', 'Savta'),
-  (2, 'Filho', 'בן', 'Ben'),
-  (2, 'Filha', 'בת', 'Bat')
+  (2, 'Bebê', 'תינוק', 'Tinok')
 ON CONFLICT DO NOTHING;
 
--- Insert sample words (Números - Numbers)
+-- Category 3: Comida (Food)
 INSERT INTO words (category_id, word_pt, word_he, transliteration) VALUES
-  (3, 'Um', 'אחד', 'Echad'),
-  (3, 'Dois', 'שניים', 'Shnayim'),
-  (3, 'Três', 'שלושה', 'Shlosha'),
-  (3, 'Quatro', 'ארבעה', 'Arba''a'),
-  (3, 'Cinco', 'חמישה', 'Chamisha'),
-  (3, 'Seis', 'שישה', 'Shisha'),
-  (3, 'Sete', 'שבעה', 'Shiv''a'),
-  (3, 'Oito', 'שמונה', 'Shmona'),
-  (3, 'Nove', 'תשעה', 'Tish''a'),
-  (3, 'Dez', 'עשרה', 'Asara')
+  (3, 'Comida', 'אוכל', 'Ochel'),
+  (3, 'Água', 'מים', 'Mayim'),
+  (3, 'Pão', 'לחם', 'Lechem'),
+  (3, 'Leite', 'חלב', 'Chalav'),
+  (3, 'Café', 'קפה', 'Kafe'),
+  (3, 'Maçã', 'תפוח', 'Tapuach'),
+  (3, 'Banana', 'בננה', 'Banana'),
+  (3, 'Ovo', 'ביצה', 'Beitza'),
+  (3, 'Queijo', 'גבינה', 'Gvina'),
+  (3, 'Salada', 'סלט', 'Salat')
+ON CONFLICT DO NOTHING;
+
+-- Category 4: Casa (House)
+INSERT INTO words (category_id, word_pt, word_he, transliteration) VALUES
+  (4, 'Casa', 'בית', 'Bayit'),
+  (4, 'Quarto', 'חדר', 'Cheder'),
+  (4, 'Cozinha', 'מטבח', 'Mitbach'),
+  (4, 'Banheiro', 'שירותים', 'Sherutim'),
+  (4, 'Sala', 'סלון', 'Salon'),
+  (4, 'Cama', 'מיטה', 'Mita'),
+  (4, 'Mesa', 'שולחן', 'Shulchan'),
+  (4, 'Cadeira', 'כיסא', 'Kise'),
+  (4, 'Porta', 'דלת', 'Delet'),
+  (4, 'Janela', 'חלון', 'Chalon')
+ON CONFLICT DO NOTHING;
+
+-- Category 5: Números (Numbers)
+INSERT INTO words (category_id, word_pt, word_he, transliteration) VALUES
+  (5, 'Um', 'אחד', 'Echad'),
+  (5, 'Dois', 'שניים', 'Shnayim'),
+  (5, 'Três', 'שלושה', 'Shlosha'),
+  (5, 'Quatro', 'אַרבָּעָה', 'Arba''a'),
+  (5, 'Cinco', 'חמישה', 'Chamisha'),
+  (5, 'Seis', 'שישה', 'Shisha'),
+  (5, 'Sete', 'שבעה', 'Shiv''a'),
+  (5, 'Oito', 'שמונה', 'Shmona'),
+  (5, 'Nove', 'תשעה', 'Tish''a'),
+  (5, 'Dez', 'עשרה', 'Asara')
+ON CONFLICT DO NOTHING;
+
+-- Category 6: Cores (Colors)
+INSERT INTO words (category_id, word_pt, word_he, transliteration) VALUES
+  (6, 'Vermelho', 'אדום', 'Adom'),
+  (6, 'Azul', 'כחול', 'Kachol'),
+  (6, 'Verde', 'ירוק', 'Yarok'),
+  (6, 'Amarelo', 'צהוב', 'Tzahov'),
+  (6, 'Preto', 'שחור', 'Shachor'),
+  (6, 'Branco', 'לבן', 'Lavan'),
+  (6, 'Rosa', 'ורוד', 'Varod'),
+  (6, 'Laranja', 'כתום', 'Katom'),
+  (6, 'Roxo', 'סגול', 'Sagol'),
+  (6, 'Marrom', 'חום', 'Chum')
+ON CONFLICT DO NOTHING;
+
+-- Category 7: Transporte (Transportation)
+INSERT INTO words (category_id, word_pt, word_he, transliteration) VALUES
+  (7, 'Carro', 'מכונית', 'Mechonit'),
+  (7, 'Ônibus', 'אוטובוס', 'Otobus'),
+  (7, 'Trem', 'רכבת', 'Rakevet'),
+  (7, 'Avião', 'מטוס', 'Matos'),
+  (7, 'Bicicleta', 'אופניים', 'Ofanayim'),
+  (7, 'Táxi', 'מונית', 'Monit'),
+  (7, 'Rua', 'רחוב', 'Rechov'),
+  (7, 'Parada', 'תחנה', 'Tachana'),
+  (7, 'Aeroporto', 'שדה תעופה', 'Sde Teufa'),
+  (7, 'Viagem', 'נסיעה', 'Nesia')
+ON CONFLICT DO NOTHING;
+
+-- Category 8: Trabalho (Work)
+INSERT INTO words (category_id, word_pt, word_he, transliteration) VALUES
+  (8, 'Trabalho', 'עבודה', 'Avoda'),
+  (8, 'Escritório', 'משרד', 'Misrad'),
+  (8, 'Computador', 'מחשב', 'Machshev'),
+  (8, 'Reunião', 'פגישה', 'Pgisha'),
+  (8, 'Chefe', 'בוס', 'Boss'),
+  (8, 'Colega', 'עמית', 'Amit'),
+  (8, 'Salário', 'משכורת', 'Maskoret'),
+  (8, 'Projeto', 'פרויקט', 'Proyekt'),
+  (8, 'Emprego', 'מקום עבודה', 'Makom Avoda'),
+  (8, 'Contrato', 'חוזה', 'Choze')
+ON CONFLICT DO NOTHING;
+
+-- Category 9: Saúde (Health)
+INSERT INTO words (category_id, word_pt, word_he, transliteration) VALUES
+  (9, 'Hospital', 'בית חולים', 'Beit Cholim'),
+  (9, 'Médico', 'רופא', 'Rofe'),
+  (9, 'Remédio', 'תרופה', 'Trufa'),
+  (9, 'Dor', 'כאב', 'Keev'),
+  (9, 'Febre', 'חום', 'Chom'),
+  (9, 'Doente', 'חולה', 'Chole'),
+  (9, 'Saúde', 'בריאות', 'Briut'),
+  (9, 'Enfermeiro', 'אח', 'Ach'),
+  (9, 'Consulta', 'תור', 'Tor'),
+  (9, 'Farmácia', 'בית מרקחת', 'Beit Mirkachat')
+ON CONFLICT DO NOTHING;
+
+-- Category 10: Compras (Shopping)
+INSERT INTO words (category_id, word_pt, word_he, transliteration) VALUES
+  (10, 'Loja', 'חנות', 'Chanut'),
+  (10, 'Mercado', 'סופרמרקט', 'Supermarket'),
+  (10, 'Dinheiro', 'כסף', 'Kesef'),
+  (10, 'Preço', 'מחיר', 'Mechir'),
+  (10, 'Caro', 'יקר', 'Yakar'),
+  (10, 'Barato', 'זול', 'Zol'),
+  (10, 'Comprar', 'לקנות', 'Liknot'),
+  (10, 'Vender', 'למכור', 'Limkor'),
+  (10, 'Cartão', 'כרטיס', 'Kartis'),
+  (10, 'Desconto', 'הנחה', 'Hanacha')
+ON CONFLICT DO NOTHING;
+
+-- Category 11: Clima (Weather)
+INSERT INTO words (category_id, word_pt, word_he, transliteration) VALUES
+  (11, 'Sol', 'שמש', 'Shemesh'),
+  (11, 'Chuva', 'גשם', 'Geshem'),
+  (11, 'Vento', 'רוח', 'Ruach'),
+  (11, 'Nuvem', 'ענן', 'Anan'),
+  (11, 'Frio', 'קר', 'Kar'),
+  (11, 'Calor', 'חם', 'Cham'),
+  (11, 'Neve', 'שלג', 'Sheleg'),
+  (11, 'Trovão', 'רעם', 'Raam'),
+  (11, 'Tempestade', 'סופה', 'Sufa'),
+  (11, 'Temperatura', 'טמפרטורה', 'Temperatura')
+ON CONFLICT DO NOTHING;
+
+-- Category 12: Tempo (Time)
+INSERT INTO words (category_id, word_pt, word_he, transliteration) VALUES
+  (12, 'Hoje', 'היום', 'Hayom'),
+  (12, 'Amanhã', 'מחר', 'Machar'),
+  (12, 'Ontem', 'אתמול', 'Etmol'),
+  (12, 'Semana', 'שבוע', 'Shavua'),
+  (12, 'Mês', 'חודש', 'Chodesh'),
+  (12, 'Ano', 'שנה', 'Shana'),
+  (12, 'Hora', 'שעה', 'Shaa'),
+  (12, 'Minuto', 'דקה', 'Daka'),
+  (12, 'Dia', 'יום', 'Yom'),
+  (12, 'Noite', 'לילה', 'Layla')
+ON CONFLICT DO NOTHING;
+
+-- Category 13: Frases Úteis (Useful Phrases)
+INSERT INTO words (category_id, word_pt, word_he, transliteration) VALUES
+  (13, 'Quanto custa?', 'כמה זה עולה', 'Kama ze ole'),
+  (13, 'Onde fica?', 'איפה זה', 'Eifo ze'),
+  (13, 'Eu entendo', 'אני מבין', 'Ani mevin'),
+  (13, 'Não entendo', 'אני לא מבין', 'Ani lo mevin'),
+  (13, 'Ajuda', 'עזרה', 'Ezra'),
+  (13, 'Emergência', 'חירום', 'Chirum'),
+  (13, 'Pode repetir?', 'אפשר לחזור', 'Efshar lachzor'),
+  (13, 'Fala inglês?', 'אתה מדבר אנגלית', 'Ata medaber anglit'),
+  (13, 'Meu nome é', 'קוראים לי', 'Korim li'),
+  (13, 'Com licença', 'סליחה', 'Slicha')
+ON CONFLICT DO NOTHING;
+
+-- Category 14: Roupas (Clothes)
+INSERT INTO words (category_id, word_pt, word_he, transliteration) VALUES
+  (14, 'Camisa', 'חולצה', 'Chultza'),
+  (14, 'Calça', 'מכנסיים', 'Michnasayim'),
+  (14, 'Sapato', 'נעל', 'Na''al'),
+  (14, 'Vestido', 'שמלה', 'Simla'),
+  (14, 'Casaco', 'מעיל', 'Me''il'),
+  (14, 'Chapéu', 'כובע', 'Kova'),
+  (14, 'Meia', 'גרב', 'Gerev'),
+  (14, 'Bolsa', 'תיק', 'Tik'),
+  (14, 'Óculos', 'משקפיים', 'Mishkafayim'),
+  (14, 'Roupa', 'בגדים', 'Bgadim')
 ON CONFLICT DO NOTHING;
 
 -- ============================================
