@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Button, Chip } from '@heroui/react';
+import { Button, Chip, Progress } from '@heroui/react';
 import {
   ArrowLeft,
   RotateCcw,
@@ -11,9 +11,30 @@ import {
   Target,
   Award,
   XCircle,
+  Flame,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import MultipleChoice from '@/components/MultipleChoice';
+import PageLoader from '@/components/PageLoader';
+import AchievementToast from '@/components/AchievementToast';
 import { useUserId } from '@/lib/hooks/useUserId';
+import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcut';
+import {
+  playSuccess,
+  playError,
+  playComplete,
+  playClick,
+  toggleSound,
+  isSoundEnabled,
+} from '@/lib/sound-effects';
+import {
+  updateStreak,
+  getStreakData,
+  checkAchievements,
+  getDailyGoal,
+  updateDailyGoal,
+} from '@/lib/gamification';
 import { updateGuestStats } from '@/lib/guest-session';
 import { useSession } from 'next-auth/react';
 
@@ -45,6 +66,43 @@ export default function QuizPage() {
   const [isComplete, setIsComplete] = useState(false);
   const [categoryName, setCategoryName] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+
+  // New gamification state
+  const [currentAchievement, setCurrentAchievement] = useState<any>(null);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [streakData, setStreakData] = useState(getStreakData());
+  const [dailyGoal, setDailyGoal] = useState(getDailyGoal());
+
+  // Initialize sound state
+  useEffect(() => {
+    setSoundEnabled(isSoundEnabled());
+  }, []);
+
+  // Keyboard shortcuts
+  useKeyboardShortcuts([
+    {
+      key: 'r',
+      callback: () => {
+        if (isComplete) {
+          restart();
+        }
+      },
+    },
+    {
+      key: 'Escape',
+      callback: () => {
+        playClick();
+        router.push('/');
+      },
+    },
+  ]);
+
+  // Play completion sound
+  useEffect(() => {
+    if (isComplete) {
+      playComplete();
+    }
+  }, [isComplete]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -87,6 +145,13 @@ export default function QuizPage() {
 
   const handleAnswer = async (isCorrect: boolean) => {
     if (questions[currentIndex]) {
+      // Play sound based on answer
+      if (isCorrect) {
+        playSuccess();
+      } else {
+        playError();
+      }
+
       const body: any = {
         wordId: questions[currentIndex].id,
         isCorrect,
@@ -107,43 +172,55 @@ export default function QuizPage() {
         updateGuestStats(isCorrect);
       }
 
+      const newScore = isCorrect ? score + 1 : score;
       if (isCorrect) {
-        setScore(score + 1);
+        setScore(newScore);
       }
+
+      // Update streak
+      const newStreak = updateStreak();
+      setStreakData(newStreak);
+
+      // Update daily goal
+      const newDailyGoal = updateDailyGoal(1);
+      setDailyGoal(newDailyGoal);
 
       if (currentIndex < questions.length - 1) {
         setCurrentIndex(currentIndex + 1);
       } else {
         setIsComplete(true);
+        
+        // Check for perfect quiz achievement
+        const newAchievements = checkAchievements({
+          wordsLearned: newScore,
+          currentStreak: newStreak.currentStreak,
+          quizScore: newScore,
+          totalQuestions: questions.length,
+        });
+
+        if (newAchievements.length > 0) {
+          setCurrentAchievement(newAchievements[0]);
+        }
       }
     }
   };
 
   const restart = () => {
+    playClick();
     setCurrentIndex(0);
     setScore(0);
     setIsComplete(false);
     generateQuestions(words);
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-cyan-900/20"></div>
-        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-pulse"></div>
+  const handleSoundToggle = () => {
+    const enabled = toggleSound();
+    setSoundEnabled(enabled);
+    playClick();
+  };
 
-        <div className="text-center relative z-10">
-          <div className="relative">
-            <div className="w-20 h-20 border-4 border-cyan-500/30 rounded-full animate-spin mx-auto mb-4"></div>
-            <div className="absolute inset-0 w-20 h-20 border-t-4 border-cyan-500 rounded-full animate-spin mx-auto"></div>
-          </div>
-          <p className="text-white text-xl font-semibold animate-pulse">
-            Preparando o quiz...
-          </p>
-        </div>
-      </div>
-    );
+  if (isLoading) {
+    return <PageLoader message="Preparando o quiz..." color="cyan" />;
   }
 
   if (questions.length === 0) {
@@ -185,7 +262,10 @@ export default function QuizPage() {
           <Button
             isIconOnly
             variant="light"
-            onClick={() => router.push('/')}
+            onClick={() => {
+              playClick();
+              router.push('/');
+            }}
             className="text-white hover:bg-white/10"
           >
             <ArrowLeft className="w-6 h-6" />
@@ -198,15 +278,62 @@ export default function QuizPage() {
             <p className="text-cyan-400 font-semibold">Quiz</p>
           </div>
 
-          <Button
-            isIconOnly
-            variant="light"
-            onClick={restart}
-            className="text-white hover:bg-white/10"
-          >
-            <RotateCcw className="w-6 h-6" />
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              isIconOnly
+              variant="light"
+              onClick={handleSoundToggle}
+              className="text-white hover:bg-white/10"
+            >
+              {soundEnabled ? (
+                <Volume2 className="w-6 h-6" />
+              ) : (
+                <VolumeX className="w-6 h-6" />
+              )}
+            </Button>
+            <Button
+              isIconOnly
+              variant="light"
+              onClick={restart}
+              className="text-white hover:bg-white/10"
+            >
+              <RotateCcw className="w-6 h-6" />
+            </Button>
+          </div>
         </div>
+
+        {/* Streak and Daily Goal */}
+        {!isComplete && (
+          <div className="flex gap-4 mb-6">
+            <div className="flex-1 bg-gradient-to-r from-orange-500/10 to-red-500/10 backdrop-blur-xl border border-orange-500/20 rounded-2xl p-4">
+              <div className="flex items-center gap-2">
+                <Flame className="w-5 h-5 text-orange-400" />
+                <div>
+                  <p className="text-white font-bold text-lg">
+                    {streakData.currentStreak} dias
+                  </p>
+                  <p className="text-white/60 text-xs">Sequência 🔥</p>
+                </div>
+              </div>
+            </div>
+            <div className="flex-1 bg-gradient-to-r from-green-500/10 to-emerald-500/10 backdrop-blur-xl border border-green-500/20 rounded-2xl p-4">
+              <div className="flex items-center gap-2">
+                <Target className="w-5 h-5 text-green-400" />
+                <div className="flex-1">
+                  <p className="text-white font-bold text-sm">
+                    {dailyGoal.completed}/{dailyGoal.target}
+                  </p>
+                  <Progress
+                    value={(dailyGoal.completed / dailyGoal.target) * 100}
+                    size="sm"
+                    color="success"
+                    className="max-w-full"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Score Display */}
         {!isComplete && (
@@ -232,7 +359,15 @@ export default function QuizPage() {
             questionNumber={currentIndex + 1}
             totalQuestions={questions.length}
           />
-        ) : (
+        ) : null}
+
+        {!isComplete && (
+          <div className="mt-4 text-center text-white/40 text-sm">
+            💡 Dica: Use R = Reiniciar | Esc = Voltar
+          </div>
+        )}
+
+        {isComplete && (
           <div className="text-center space-y-8 py-12">
             {/* Trophy/Medal Animation */}
             <div className="text-9xl animate-bounce">
@@ -309,6 +444,12 @@ export default function QuizPage() {
           </div>
         )}
       </div>
+
+      {/* Achievement Toast */}
+      <AchievementToast
+        achievement={currentAchievement}
+        onClose={() => setCurrentAchievement(null)}
+      />
     </main>
   );
 }

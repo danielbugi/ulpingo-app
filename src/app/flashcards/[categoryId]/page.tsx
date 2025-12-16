@@ -10,9 +10,31 @@ import {
   Trophy,
   TrendingUp,
   XCircle,
+  Flame,
+  Volume2,
+  VolumeX,
+  Target,
 } from 'lucide-react';
 import FlashCard from '@/components/FlashCard';
+import PageLoader from '@/components/PageLoader';
+import AchievementToast from '@/components/AchievementToast';
 import { useUserId } from '@/lib/hooks/useUserId';
+import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcut';
+import {
+  playSuccess,
+  playError,
+  playComplete,
+  playClick,
+  toggleSound,
+  isSoundEnabled,
+} from '@/lib/sound-effects';
+import {
+  updateStreak,
+  getStreakData,
+  checkAchievements,
+  getDailyGoal,
+  updateDailyGoal,
+} from '@/lib/gamification';
 import { saveGuestProgress, updateGuestStats } from '@/lib/guest-session';
 import { useSession } from 'next-auth/react';
 
@@ -37,6 +59,59 @@ export default function FlashcardsPage() {
   const [categoryName, setCategoryName] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
+  // New gamification state
+  const [currentAchievement, setCurrentAchievement] = useState<any>(null);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [streakData, setStreakData] = useState(getStreakData());
+  const [dailyGoal, setDailyGoal] = useState(getDailyGoal());
+
+  // Initialize sound state
+  useEffect(() => {
+    setSoundEnabled(isSoundEnabled());
+  }, []);
+
+  // Keyboard shortcuts
+  useKeyboardShortcuts([
+    {
+      key: '1',
+      callback: () => {
+        if (!isComplete && words[currentIndex]) {
+          handleKnow();
+        }
+      },
+    },
+    {
+      key: '2',
+      callback: () => {
+        if (!isComplete && words[currentIndex]) {
+          handleDontKnow();
+        }
+      },
+    },
+    {
+      key: 'r',
+      callback: () => {
+        if (isComplete) {
+          restart();
+        }
+      },
+    },
+    {
+      key: 'Escape',
+      callback: () => {
+        playClick();
+        router.push('/');
+      },
+    },
+  ]);
+
+  // Play completion sound
+  useEffect(() => {
+    if (isComplete) {
+      playComplete();
+    }
+  }, [isComplete]);
+
   useEffect(() => {
     setIsLoading(true);
     fetch(`/api/words/${categoryId}`)
@@ -54,6 +129,9 @@ export default function FlashcardsPage() {
 
   const handleKnow = async () => {
     if (words[currentIndex]) {
+      // Play success sound
+      playSuccess();
+
       const body: any = {
         wordId: words[currentIndex].id,
         isCorrect: true,
@@ -74,13 +152,39 @@ export default function FlashcardsPage() {
         updateGuestStats(true);
       }
 
-      setStats((prev) => ({ ...prev, known: prev.known + 1 }));
+      // Update stats
+      const newStats = { ...stats, known: stats.known + 1 };
+      setStats(newStats);
+
+      // Update streak
+      const newStreak = updateStreak();
+      setStreakData(newStreak);
+
+      // Update daily goal
+      const newDailyGoal = updateDailyGoal(1);
+      setDailyGoal(newDailyGoal);
+
+      // Check for achievements
+      const totalWords = newStats.known + newStats.unknown;
+      const newAchievements = checkAchievements({
+        wordsLearned: totalWords,
+        currentStreak: newStreak.currentStreak,
+      });
+
+      // Show first new achievement
+      if (newAchievements.length > 0) {
+        setCurrentAchievement(newAchievements[0]);
+      }
+
       nextCard();
     }
   };
 
   const handleDontKnow = async () => {
     if (words[currentIndex]) {
+      // Play error sound
+      playError();
+
       const body: any = {
         wordId: words[currentIndex].id,
         isCorrect: false,
@@ -101,7 +205,14 @@ export default function FlashcardsPage() {
         updateGuestStats(false);
       }
 
-      setStats((prev) => ({ ...prev, unknown: prev.unknown + 1 }));
+      // Update stats
+      const newStats = { ...stats, unknown: stats.unknown + 1 };
+      setStats(newStats);
+
+      // Update daily goal (attempted word)
+      const newDailyGoal = updateDailyGoal(1);
+      setDailyGoal(newDailyGoal);
+
       nextCard();
     }
   };
@@ -115,29 +226,20 @@ export default function FlashcardsPage() {
   };
 
   const restart = () => {
+    playClick();
     setCurrentIndex(0);
     setStats({ known: 0, unknown: 0 });
     setIsComplete(false);
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-cyan-900/20"></div>
-        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-pulse"></div>
+  const handleSoundToggle = () => {
+    const enabled = toggleSound();
+    setSoundEnabled(enabled);
+    playClick();
+  };
 
-        <div className="text-center relative z-10">
-          <div className="relative">
-            <div className="w-20 h-20 border-4 border-purple-500/30 rounded-full animate-spin mx-auto mb-4"></div>
-            <div className="absolute inset-0 w-20 h-20 border-t-4 border-purple-500 rounded-full animate-spin mx-auto"></div>
-          </div>
-          <p className="text-white text-xl font-semibold animate-pulse">
-            Carregando flashcards...
-          </p>
-        </div>
-      </div>
-    );
+  if (isLoading) {
+    return <PageLoader message="Carregando flashcards..." color="purple" />;
   }
 
   if (words.length === 0) {
@@ -175,7 +277,10 @@ export default function FlashcardsPage() {
           <Button
             isIconOnly
             variant="light"
-            onClick={() => router.push('/')}
+            onClick={() => {
+              playClick();
+              router.push('/');
+            }}
             className="text-white hover:bg-white/10"
           >
             <ArrowLeft className="w-6 h-6" />
@@ -188,18 +293,63 @@ export default function FlashcardsPage() {
             <p className="text-purple-400 font-semibold">Flashcards</p>
           </div>
 
-          <Button
-            isIconOnly
-            variant="light"
-            onClick={restart}
-            className="text-white hover:bg-white/10"
-          >
-            <RotateCcw className="w-6 h-6" />
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              isIconOnly
+              variant="light"
+              onClick={handleSoundToggle}
+              className="text-white hover:bg-white/10"
+            >
+              {soundEnabled ? (
+                <Volume2 className="w-6 h-6" />
+              ) : (
+                <VolumeX className="w-6 h-6" />
+              )}
+            </Button>
+            <Button
+              isIconOnly
+              variant="light"
+              onClick={restart}
+              className="text-white hover:bg-white/10"
+            >
+              <RotateCcw className="w-6 h-6" />
+            </Button>
+          </div>
         </div>
 
         {/* Progress Stats */}
         <div className="mb-8 space-y-4">
+          {/* Streak and Daily Goal */}
+          <div className="flex gap-4 mb-4">
+            <div className="flex-1 bg-gradient-to-r from-orange-500/10 to-red-500/10 backdrop-blur-xl border border-orange-500/20 rounded-2xl p-4">
+              <div className="flex items-center gap-2">
+                <Flame className="w-5 h-5 text-orange-400" />
+                <div>
+                  <p className="text-white font-bold text-lg">
+                    {streakData.currentStreak} dias
+                  </p>
+                  <p className="text-white/60 text-xs">Sequência 🔥</p>
+                </div>
+              </div>
+            </div>
+            <div className="flex-1 bg-gradient-to-r from-green-500/10 to-emerald-500/10 backdrop-blur-xl border border-green-500/20 rounded-2xl p-4">
+              <div className="flex items-center gap-2">
+                <Target className="w-5 h-5 text-green-400" />
+                <div className="flex-1">
+                  <p className="text-white font-bold text-sm">
+                    {dailyGoal.completed}/{dailyGoal.target}
+                  </p>
+                  <Progress
+                    value={(dailyGoal.completed / dailyGoal.target) * 100}
+                    size="sm"
+                    color="success"
+                    className="max-w-full"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 backdrop-blur-xl border border-purple-500/20 rounded-2xl p-4">
             <div className="flex justify-between items-center mb-2">
               <span className="text-white font-semibold">Progresso</span>
@@ -250,6 +400,12 @@ export default function FlashcardsPage() {
             totalCards={words.length}
           />
         ) : (
+          <div className="mb-4 text-center text-white/40 text-sm">
+            💡 Dica: Use teclas 1 = Conheço | 2 = Não conheço | R = Reiniciar | Esc = Voltar
+          </div>
+        )}
+
+        {isComplete && (
           <div className="text-center space-y-8 py-12">
             <div className="text-8xl animate-bounce">🎉</div>
 
@@ -309,6 +465,12 @@ export default function FlashcardsPage() {
           </div>
         )}
       </div>
+
+      {/* Achievement Toast */}
+      <AchievementToast
+        achievement={currentAchievement}
+        onClose={() => setCurrentAchievement(null)}
+      />
     </main>
   );
 }

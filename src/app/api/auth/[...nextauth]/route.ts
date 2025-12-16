@@ -3,4 +3,8 @@ import NextAuth from 'next-auth';
 import { authOptions } from '@/lib/auth-options';
 
 const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };
+export const GET = handler;
+export const POST = handler;
+
+// Fix Next.js 14 type checking
+export const runtime = 'nodejs';
