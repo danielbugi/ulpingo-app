@@ -2,12 +2,34 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Pool } from 'pg';
 import bcrypt from 'bcryptjs';
+import {
+  checkRateLimit,
+  getClientIdentifier,
+  RATE_LIMITS,
+} from '@/lib/rate-limit';
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
 export async function POST(request: NextRequest) {
+  // Rate limiting for auth endpoints
+  const identifier = getClientIdentifier(request);
+  const rateLimit = checkRateLimit(identifier, RATE_LIMITS.AUTH);
+
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: 'Too many registration attempts. Please try again later.' },
+      {
+        status: 429,
+        headers: {
+          'X-RateLimit-Limit': rateLimit.limit.toString(),
+          'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+          'X-RateLimit-Reset': new Date(rateLimit.reset).toISOString(),
+        },
+      }
+    );
+  }
   try {
     const body = await request.json();
     const { email, password, name } = body;

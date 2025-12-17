@@ -1,10 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getWordsByCategory, getAllWords, getCategoryById } from '@/lib/db-new';
+import {
+  checkRateLimit,
+  getClientIdentifier,
+  RATE_LIMITS,
+} from '@/lib/rate-limit';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { categoryId: string } }
 ) {
+  // Rate limiting
+  const identifier = getClientIdentifier(request);
+  const rateLimit = checkRateLimit(identifier, RATE_LIMITS.API_GENERAL);
+
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      {
+        status: 429,
+        headers: {
+          'X-RateLimit-Limit': rateLimit.limit.toString(),
+          'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+          'X-RateLimit-Reset': new Date(rateLimit.reset).toISOString(),
+        },
+      }
+    );
+  }
   try {
     const categoryId = params.categoryId;
 

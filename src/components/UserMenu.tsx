@@ -89,7 +89,7 @@ export default function UserMenu() {
         <DropdownItem
           key="achievements"
           startContent={<Trophy className="w-4 h-4 text-yellow-500" />}
-          onClick={() => router.push('/achievements')}
+          onClick={() => router.push('/conquistas')}
           className="text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg px-3 py-2 mb-1 border border-transparent hover:border-white/5"
         >
           Conquistas
@@ -97,7 +97,7 @@ export default function UserMenu() {
         <DropdownItem
           key="profile-page"
           startContent={<User className="w-4 h-4 text-blue-500" />}
-          onClick={() => router.push('/profile')}
+          onClick={() => router.push('/perfil')}
           className="text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg px-3 py-2 mb-1 border border-transparent hover:border-white/5"
         >
           Meu Perfil
@@ -105,7 +105,7 @@ export default function UserMenu() {
         <DropdownItem
           key="settings"
           startContent={<Settings className="w-4 h-4 text-gray-500" />}
-          onClick={() => router.push('/settings')}
+          onClick={() => router.push('/configuracoes')}
           className="text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg px-3 py-2 mb-1 border border-transparent hover:border-white/5"
         >
           Configurações
