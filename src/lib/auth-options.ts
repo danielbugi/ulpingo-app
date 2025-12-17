@@ -106,8 +106,8 @@ export const authOptions: NextAuthOptions = {
         token.role = user.role;
       }
 
-      // Refresh role from database if needed
-      if (trigger === 'update' || !token.role) {
+      // Always fetch role from database to ensure it's up to date
+      if (token.id && (!token.role || trigger === 'update')) {
         try {
           const pool = getPool();
           const result = await pool.query(

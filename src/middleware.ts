@@ -5,14 +5,19 @@ import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+
+  // Redirect authenticated users away from auth pages
+  if (token && (pathname.startsWith('/auth/signin') || pathname.startsWith('/auth/signup'))) {
+    return NextResponse.redirect(new URL('/', request.url));
+  }
 
   // Check if accessing admin routes (pages or API)
   if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
-    const token = await getToken({
-      req: request,
-      secret: process.env.NEXTAUTH_SECRET,
-    });
-
     // For API routes, return 401/403 instead of redirect
     if (pathname.startsWith('/api/admin')) {
       if (!token) {
@@ -50,6 +55,8 @@ export const config = {
   matcher: [
     '/admin/:path*',
     '/api/admin/:path*',
+    '/auth/signin',
+    '/auth/signup',
     '/flashcards/:path*',
     '/quiz/:path*',
     '/review/:path*',

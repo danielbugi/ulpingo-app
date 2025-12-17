@@ -21,7 +21,7 @@ function execWithEnv(command, env) {
     stdio: 'inherit',
     cwd: path.join(__dirname, '..'),
     shell: true,
-    env: { ...process.env, ...env }
+    env: { ...process.env, ...env },
   });
   if (result.status !== 0) {
     throw new Error(`Command failed with exit code ${result.status}`);
@@ -34,7 +34,9 @@ async function main() {
   if (!PROD_DB_URL) {
     console.error('❌ Error: Production DATABASE_URL required\n');
     console.log('Usage:');
-    console.log('  node scripts/deploy-admin-to-production.js <DATABASE_URL> [email] [password] [name]\n');
+    console.log(
+      '  node scripts/deploy-admin-to-production.js <DATABASE_URL> [email] [password] [name]\n'
+    );
     console.log('Or set PROD_DATABASE_URL environment variable\n');
     process.exit(1);
   }
@@ -45,7 +47,10 @@ async function main() {
 
   // Step 2: Create admin user
   console.log('\n👤 Creating admin user...');
-  execWithEnv(`node scripts/create-admin.js "${ADMIN_EMAIL}" "${ADMIN_PASSWORD}" "${ADMIN_NAME}"`, { DATABASE_URL: PROD_DB_URL });
+  execWithEnv(
+    `node scripts/create-admin.js "${ADMIN_EMAIL}" "${ADMIN_PASSWORD}" "${ADMIN_NAME}"`,
+    { DATABASE_URL: PROD_DB_URL }
+  );
 
   // Step 3: Git commit and push
   console.log('\n📦 Committing and pushing to GitHub...');
@@ -58,7 +63,7 @@ async function main() {
   console.log('🚀 Vercel will auto-deploy from GitHub\n');
 }
 
-main().catch(error => {
+main().catch((error) => {
   console.error('\n❌ Error:', error.message);
   process.exit(1);
 });
