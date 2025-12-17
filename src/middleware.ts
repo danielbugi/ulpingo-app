@@ -13,7 +13,15 @@ export async function middleware(request: NextRequest) {
       secret: process.env.NEXTAUTH_SECRET,
     });
 
+    console.log('[Middleware] Token:', {
+      exists: !!token,
+      role: token?.role,
+      email: token?.email,
+      id: token?.id,
+    });
+
     if (!token) {
+      console.log('[Middleware] No token found - returning 401');
       return NextResponse.json(
         { error: 'Unauthorized - Please sign in' },
         { status: 401 }
@@ -21,18 +29,19 @@ export async function middleware(request: NextRequest) {
     }
 
     if (token.role !== 'admin') {
+      console.log('[Middleware] User role is not admin:', token.role);
       return NextResponse.json(
         { error: 'Forbidden - Admin access required' },
         { status: 403 }
       );
     }
+
+    console.log('[Middleware] Admin access granted');
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    '/api/admin/:path*',
-  ],
+  matcher: ['/api/admin/:path*'],
 };
