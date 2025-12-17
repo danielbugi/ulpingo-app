@@ -4,6 +4,9 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-options';
 import AdminDashboard from './AdminDashboard';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export const metadata = {
   title: 'Admin Dashboard',
   description: 'Ulpingo Admin Dashboard',
