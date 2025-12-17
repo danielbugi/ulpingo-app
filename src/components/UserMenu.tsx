@@ -9,7 +9,7 @@ import {
   Avatar,
   Button,
 } from '@heroui/react';
-import { User, Trophy, Settings, LogOut } from 'lucide-react';
+import { User, Trophy, Settings, LogOut, Shield } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -50,6 +50,8 @@ export default function UserMenu() {
   const userInitial =
     session.user?.name?.[0] || session.user?.email?.[0] || 'U';
 
+  const isAdmin = session.user.role === 'admin';
+
   return (
     <Dropdown placement="bottom-end">
       <DropdownTrigger>
@@ -74,6 +76,16 @@ export default function UserMenu() {
             {session.user?.email}
           </p>
         </DropdownItem>
+        {isAdmin ? (
+          <DropdownItem
+            key="admin"
+            startContent={<Shield className="w-4 h-4 text-purple-500" />}
+            onClick={() => router.push('/admin')}
+            className="text-purple-300 hover:text-purple-200 hover:bg-purple-500/10 rounded-lg px-3 py-2 mb-1 border border-purple-500/20 hover:border-purple-500/40"
+          >
+            Admin Dashboard
+          </DropdownItem>
+        ) : null}
         <DropdownItem
           key="achievements"
           startContent={<Trophy className="w-4 h-4 text-yellow-500" />}

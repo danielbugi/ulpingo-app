@@ -50,6 +50,7 @@ export const authOptions: NextAuthOptions = {
             name: user.name,
             image: user.image,
             provider: user.provider,
+            role: user.role || 'user',
           };
         } catch (error) {
           console.error('Auth error:', error);
@@ -71,14 +72,15 @@ export const authOptions: NextAuthOptions = {
 
         if (existingUser.rows.length === 0) {
           await pool.query(
-            `INSERT INTO users (email, name, image, provider, provider_account_id, email_verified) 
-             VALUES ($1, $2, $3, $4, $5, NOW())`,
+            `INSERT INTO users (email, name, image, provider, provider_account_id, email_verified, role) 
+             VALUES ($1, $2, $3, $4, $5, NOW(), $6)`,
             [
               user.email,
               user.name,
               user.image,
               account?.provider || 'email',
               account?.providerAccountId || null,
+              'user',
             ]
           );
 
@@ -98,15 +100,34 @@ export const authOptions: NextAuthOptions = {
         return false;
       }
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
+        token.role = user.role;
       }
+
+      // Refresh role from database if needed
+      if (trigger === 'update' || !token.role) {
+        try {
+          const pool = getPool();
+          const result = await pool.query(
+            'SELECT role FROM users WHERE id = $1',
+            [token.id]
+          );
+          if (result.rows[0]) {
+            token.role = result.rows[0].role;
+          }
+        } catch (error) {
+          console.error('Error fetching user role:', error);
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
+        session.user.role = token.role as 'user' | 'admin';
       }
       return session;
     },
