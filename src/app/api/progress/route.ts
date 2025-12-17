@@ -14,6 +14,9 @@ import {
   validateRequiredFields,
 } from '@/lib/api-utils';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);

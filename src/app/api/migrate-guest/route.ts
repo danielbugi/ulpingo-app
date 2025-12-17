@@ -3,6 +3,9 @@ import { migrateGuestProgress } from '@/lib/db-new';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 // POST /api/migrate-guest - Migrate guest progress to user account
 export async function POST(request: NextRequest) {
   try {

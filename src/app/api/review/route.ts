@@ -3,6 +3,9 @@ import { getDueWords, getDueCount } from '@/lib/db-new';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 // GET /api/review - Get words due for review
 export async function GET(request: NextRequest) {
   try {

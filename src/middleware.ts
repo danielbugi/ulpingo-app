@@ -20,7 +20,7 @@ export async function middleware(request: NextRequest) {
         role: token?.role,
         email: token?.email,
         id: token?.id,
-        cookies: request.cookies.getAll().map(c => c.name),
+        cookies: request.cookies.getAll().map((c) => c.name),
       });
 
       if (!token) {
