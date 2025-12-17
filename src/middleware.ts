@@ -5,14 +5,17 @@ import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  
+
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
   });
 
   // Redirect authenticated users away from auth pages
-  if (token && (pathname.startsWith('/auth/signin') || pathname.startsWith('/auth/signup'))) {
+  if (
+    token &&
+    (pathname.startsWith('/auth/signin') || pathname.startsWith('/auth/signup'))
+  ) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
