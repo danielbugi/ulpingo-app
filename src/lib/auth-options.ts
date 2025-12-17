@@ -104,7 +104,7 @@ export const authOptions: NextAuthOptions = {
       // On sign in, fetch user data from database
       if (user) {
         token.id = user.id;
-        
+
         // Fetch role from database
         try {
           const pool = getPool();

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { signIn } from 'next-auth/react';
+import { useState, useEffect } from 'react';
+import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button, Card, CardBody, CardHeader, Divider } from '@heroui/react';
 import { Mail, Lock, Loader2 } from 'lucide-react';
@@ -10,10 +10,19 @@ import { StyledInput } from '@/components/StyledInput';
 
 export default function SignInPage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (status === 'authenticated') {
+      router.push('/');
+      router.refresh();
+    }
+  }, [status, router]);
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
