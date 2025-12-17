@@ -55,8 +55,7 @@ export const config = {
   matcher: [
     '/admin/:path*',
     '/api/admin/:path*',
-    '/auth/signin',
-    '/auth/signup',
+    '/auth/:path*',
     '/flashcards/:path*',
     '/quiz/:path*',
     '/review/:path*',

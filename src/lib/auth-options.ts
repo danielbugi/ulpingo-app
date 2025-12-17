@@ -100,14 +100,32 @@ export const authOptions: NextAuthOptions = {
         return false;
       }
     },
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user, trigger, account }) {
+      // On sign in, fetch user data from database
       if (user) {
         token.id = user.id;
-        token.role = user.role;
+        
+        // Fetch role from database
+        try {
+          const pool = getPool();
+          const result = await pool.query(
+            'SELECT id, email, role FROM users WHERE id = $1',
+            [user.id]
+          );
+          if (result.rows[0]) {
+            token.role = result.rows[0].role || 'user';
+            token.email = result.rows[0].email;
+          } else {
+            token.role = 'user';
+          }
+        } catch (error) {
+          console.error('Error fetching user data in JWT:', error);
+          token.role = 'user';
+        }
       }
 
-      // Always fetch role from database to ensure it's up to date
-      if (token.id && (!token.role || trigger === 'update')) {
+      // Refresh role if needed
+      if (trigger === 'update' && token.id) {
         try {
           const pool = getPool();
           const result = await pool.query(
@@ -118,7 +136,7 @@ export const authOptions: NextAuthOptions = {
             token.role = result.rows[0].role;
           }
         } catch (error) {
-          console.error('Error fetching user role:', error);
+          console.error('Error updating user role:', error);
         }
       }
 
