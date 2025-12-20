@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useParams, useRouter } from 'next/navigation';
 import { Button, Chip, Progress } from '@heroui/react';
 import {
@@ -14,10 +15,12 @@ import {
   Flame,
   Volume2,
   VolumeX,
+  Star,
 } from 'lucide-react';
 import MultipleChoice from '@/components/MultipleChoice';
 import PageLoader from '@/components/PageLoader';
 import AchievementToast from '@/components/AchievementToast';
+import { XPGain, LevelUpModal } from '@/components/LevelDisplay';
 import { useUserId } from '@/lib/hooks/useUserId';
 import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcut';
 import {
@@ -72,6 +75,17 @@ export default function QuizPage() {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [streakData, setStreakData] = useState(getStreakData());
   const [dailyGoal, setDailyGoal] = useState(getDailyGoal());
+  const [showXpGain, setShowXpGain] = useState(false);
+  const [xpGained, setXpGained] = useState(0);
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const [newLevel, setNewLevel] = useState(1);
+  const [quizStats, setQuizStats] = useState<{
+    isNewBest: boolean;
+    isPerfect: boolean;
+    attemptNumber: number;
+    previousBest: number;
+  } | null>(null);
+  const [startTime] = useState(Date.now());
 
   // Initialize sound state
   useEffect(() => {
@@ -185,10 +199,59 @@ export default function QuizPage() {
       const newDailyGoal = updateDailyGoal(1);
       setDailyGoal(newDailyGoal);
 
+      // Add XP for quiz answer (only for authenticated users)
+      if (session?.user && isCorrect) {
+        try {
+          const xpResponse = await fetch('/api/xp/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ customAmount: 15 }),
+          });
+
+          if (xpResponse.ok) {
+            const xpData = await xpResponse.json();
+            setXpGained(xpData.xpGained);
+            setShowXpGain(true);
+            setTimeout(() => setShowXpGain(false), 3000);
+
+            // Check if leveled up
+            if (xpData.leveledUp) {
+              setNewLevel(xpData.newLevel);
+              setShowLevelUp(true);
+            }
+          }
+        } catch (error) {
+          console.error('Error adding XP:', error);
+        }
+      }
       if (currentIndex < questions.length - 1) {
         setCurrentIndex(currentIndex + 1);
       } else {
         setIsComplete(true);
+
+        // Save quiz attempt
+        if (session?.user) {
+          try {
+            const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+            const saveResponse = await fetch('/api/quiz/save', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                categoryId: parseInt(categoryId),
+                totalQuestions: questions.length,
+                correctAnswers: newScore,
+                timeTaken,
+              }),
+            });
+
+            if (saveResponse.ok) {
+              const saveData = await saveResponse.json();
+              setQuizStats(saveData.stats);
+            }
+          } catch (error) {
+            console.error('Error saving quiz attempt:', error);
+          }
+        }
 
         // Check for perfect quiz achievement
         const newAchievements = checkAchievements({
@@ -388,6 +451,60 @@ export default function QuizPage() {
               </p>
             </div>
 
+            {/* Quiz Statistics */}
+            {quizStats && (
+              <div className="flex justify-center gap-4 flex-wrap max-w-2xl mx-auto">
+                {quizStats.isNewBest && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border-2 border-yellow-500/50 rounded-xl px-6 py-3"
+                  >
+                    <div className="text-yellow-400 font-bold text-lg flex items-center gap-2">
+                      <Star className="w-5 h-5" />
+                      Novo Recorde Pessoal!
+                    </div>
+                  </motion.div>
+                )}
+                {quizStats.isPerfect && quizStats.attemptNumber > 1 && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-2 border-purple-500/50 rounded-xl px-6 py-3"
+                  >
+                    <div className="text-purple-400 font-bold flex items-center gap-2">
+                      🎯 100% Perfeito!
+                    </div>
+                  </motion.div>
+                )}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="bg-gradient-to-br from-cyan-600/20 to-blue-600/20 border border-cyan-500/30 rounded-xl px-6 py-3"
+                >
+                  <div className="text-sm text-gray-400">Tentativa</div>
+                  <div className="text-2xl font-bold text-cyan-400">
+                    #{quizStats.attemptNumber}
+                  </div>
+                </motion.div>
+                {quizStats.previousBest > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="bg-gradient-to-br from-green-600/20 to-emerald-600/20 border border-green-500/30 rounded-xl px-6 py-3"
+                  >
+                    <div className="text-sm text-gray-400">Melhor Anterior</div>
+                    <div className="text-2xl font-bold text-green-400">
+                      {quizStats.previousBest}%
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+            )}
+
             {/* Score Circle */}
             <div className="relative inline-block">
               <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full blur-2xl opacity-50 animate-pulse"></div>
@@ -450,6 +567,17 @@ export default function QuizPage() {
         achievement={currentAchievement}
         onClose={() => setCurrentAchievement(null)}
       />
+
+      {/* XP Gain Toast */}
+      {showXpGain && <XPGain amount={xpGained} />}
+
+      {/* Level Up Modal */}
+      {showLevelUp && (
+        <LevelUpModal
+          newLevel={newLevel}
+          onClose={() => setShowLevelUp(false)}
+        />
+      )}
     </main>
   );
 }

@@ -18,6 +18,7 @@ import {
 import FlashCard from '@/components/FlashCard';
 import PageLoader from '@/components/PageLoader';
 import AchievementToast from '@/components/AchievementToast';
+import { XPGain, LevelUpModal } from '@/components/LevelDisplay';
 import { useUserId } from '@/lib/hooks/useUserId';
 import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcut';
 import {
@@ -64,6 +65,10 @@ export default function FlashcardsPage() {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [streakData, setStreakData] = useState(getStreakData());
   const [dailyGoal, setDailyGoal] = useState(getDailyGoal());
+  const [showXpGain, setShowXpGain] = useState(false);
+  const [xpGained, setXpGained] = useState(0);
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const [newLevel, setNewLevel] = useState(1);
 
   // Initialize sound state
   useEffect(() => {
@@ -176,6 +181,31 @@ export default function FlashcardsPage() {
         setCurrentAchievement(newAchievements[0]);
       }
 
+      // Add XP for correct answer (only for authenticated users)
+      if (session?.user) {
+        try {
+          const xpResponse = await fetch('/api/xp/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'FLASHCARD_CORRECT' }),
+          });
+
+          if (xpResponse.ok) {
+            const xpData = await xpResponse.json();
+            setXpGained(xpData.xpGained);
+            setShowXpGain(true);
+            setTimeout(() => setShowXpGain(false), 3000);
+
+            // Check if leveled up
+            if (xpData.leveledUp) {
+              setNewLevel(xpData.newLevel);
+              setShowLevelUp(true);
+            }
+          }
+        } catch (error) {
+          console.error('Error adding XP:', error);
+        }
+      }
       nextCard();
     }
   };
@@ -472,6 +502,17 @@ export default function FlashcardsPage() {
         achievement={currentAchievement}
         onClose={() => setCurrentAchievement(null)}
       />
+
+      {/* XP Gain Toast */}
+      {showXpGain && <XPGain amount={xpGained} />}
+
+      {/* Level Up Modal */}
+      {showLevelUp && (
+        <LevelUpModal
+          newLevel={newLevel}
+          onClose={() => setShowLevelUp(false)}
+        />
+      )}
     </main>
   );
 }

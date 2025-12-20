@@ -15,6 +15,9 @@ import { authOptions } from '@/lib/auth';
 import HomeClient from '@/app/HomeClient';
 import WelcomeModal from '@/components/WelcomeModal';
 import Script from 'next/script';
+import { LevelDisplayWrapper } from '@/components/LevelDisplayWrapper';
+import { getUserStats } from '@/lib/db-level-system';
+import { getLevelProgress } from '@/lib/level-system';
 
 export const metadata = {
   title: 'Ulpingo - Aprenda Hebraico Grátis com Flashcards | Curso Online',
@@ -34,6 +37,10 @@ export default async function Home() {
   // Guest users will load their data client-side from localStorage
   const progress = userId ? await getProgress(userId) : [];
   let dueCount = userId ? await getDueCount(userId) : 0;
+
+  // Get user stats for level system
+  const userStats = userId ? await getUserStats(userId) : null;
+  const levelProgress = userStats ? getLevelProgress(userStats.totalXp) : null;
 
   const totalWords = progress.length;
   const correctAnswers = progress.reduce((sum, p) => sum + p.correct_count, 0);
@@ -144,6 +151,13 @@ export default async function Home() {
               </div>
             )}
           </div>
+
+          {/* Level Display */}
+          {userStats && levelProgress && (
+            <div className="mb-16 max-w-4xl mx-auto">
+              <LevelDisplayWrapper progress={levelProgress} />
+            </div>
+          )}
 
           {/* Review Section - Add this after Hero Section */}
           {dueCount > 0 && (
