@@ -40,7 +40,12 @@ async function runMigration() {
   try {
     for (const migrationFile of migrations) {
       console.log(`\n📊 Running migration: ${migrationFile}...\n`);
-      const migrationPath = path.join(__dirname, '..', 'database', migrationFile);
+      const migrationPath = path.join(
+        __dirname,
+        '..',
+        'database',
+        migrationFile
+      );
       if (!fs.existsSync(migrationPath)) {
         console.warn(`⚠️  Migration file not found: ${migrationFile}`);
         continue;
@@ -83,8 +88,12 @@ async function runMigration() {
 
     console.log('\n✅ All migrations completed successfully!\n');
     console.log('Next steps:');
-    console.log('1. Run: node scripts/create-admin.js <email> <password> <name>');
-    console.log("2. Or update existing user: UPDATE users SET role = 'admin' WHERE email = 'your@email.com'\n");
+    console.log(
+      '1. Run: node scripts/create-admin.js <email> <password> <name>'
+    );
+    console.log(
+      "2. Or update existing user: UPDATE users SET role = 'admin' WHERE email = 'your@email.com'\n"
+    );
   } catch (error) {
     console.error('\n❌ Error running migration:');
     console.error(`   Code: ${error.code}`);

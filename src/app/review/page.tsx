@@ -172,28 +172,32 @@ export default function ReviewPage() {
       <div className="relative z-10 container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <Button
-            variant="light"
-            startContent={<ArrowLeft className="w-5 h-5" />}
-            className="text-white"
-            onClick={() => router.push('/')}
-          >
-            Voltar
-          </Button>
+          <div className="flex flex-col sm:flex-row w-full gap-4 sm:gap-0 justify-between items-center">
+            <Button
+              variant="light"
+              startContent={<ArrowLeft className="w-5 h-5" />}
+              className="text-white w-full sm:w-auto"
+              onClick={() => router.push('/')}
+            >
+              Voltar
+            </Button>
 
-          <div className="flex items-center gap-2 bg-purple-500/20 backdrop-blur-xl border border-purple-500/30 rounded-full px-6 py-3">
-            <Calendar className="w-5 h-5 text-purple-400" />
-            <span className="text-white font-bold">Revisão do Dia</span>
+            <div className="flex items-center gap-2 bg-purple-500/20 backdrop-blur-xl border border-purple-500/30 rounded-full px-4 py-2 sm:px-6 sm:py-3 mt-2 sm:mt-0">
+              <Calendar className="w-5 h-5 text-purple-400" />
+              <span className="text-white font-bold text-base sm:text-lg">
+                Revisão do Dia
+              </span>
+            </div>
+
+            <Button
+              variant="light"
+              startContent={<Home className="w-5 h-5" />}
+              className="text-white w-full sm:w-auto"
+              onClick={() => router.push('/')}
+            >
+              Início
+            </Button>
           </div>
-
-          <Button
-            variant="light"
-            startContent={<Home className="w-5 h-5" />}
-            className="text-white"
-            onClick={() => router.push('/')}
-          >
-            Início
-          </Button>
         </div>
 
         {/* Progress Section */}
