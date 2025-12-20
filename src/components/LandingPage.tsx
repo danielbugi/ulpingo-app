@@ -18,30 +18,6 @@ export default function LandingPage() {
         </div>
 
         <div className="relative container mx-auto px-4 py-20">
-          {/* Navigation */}
-          <nav className="flex justify-between items-center mb-16">
-            <div className="text-3xl font-bold">
-              <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
-                Ulpingo
-              </span>
-            </div>
-            <div className="flex gap-4">
-              <Link href="/auth/signin">
-                <Button
-                  variant="ghost"
-                  className="text-gray-300 hover:text-white"
-                >
-                  Entrar
-                </Button>
-              </Link>
-              <Link href="/auth/signup">
-                <Button className="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold hover:from-purple-500 hover:to-pink-500">
-                  Criar Conta
-                </Button>
-              </Link>
-            </div>
-          </nav>
-
           {/* Hero Content */}
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full mb-8">
